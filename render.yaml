@@ -3,5 +3,6 @@ services:
     name: test2-live-signal
     runtime: node
     plan: free
+    rootDir: live-signal-service
     buildCommand: npm install
-    startCommand: npm run live:signal
+    startCommand: npm run start

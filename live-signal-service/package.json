@@ -1,0 +1,12 @@
+{
+  "name": "test11-live-signal-service",
+  "version": "1.0.0",
+  "private": true,
+  "main": "../live-signal-server.js",
+  "scripts": {
+    "start": "node ../live-signal-server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
