@@ -21,6 +21,15 @@ const DUMMY_COMMENTS = [
     "音声も確認できています。",
 ];
 
+const DUMMY_VIEWER_NAMES = [
+    "視聴者A",
+    "視聴者B",
+    "参加者1",
+    "参加者2",
+    "受講者A",
+    "受講者B",
+];
+
 const ICE_SERVERS = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -54,9 +63,8 @@ function wait(ms) {
     });
 }
 
-function formatAddressLabel(address, prefix = "USER") {
-    if (!address) return prefix;
-    return `${prefix}_${address.slice(0, 6)}...${address.slice(-4)}`;
+function formatDefaultLabel(prefix = "USER") {
+    return prefix;
 }
 
 async function wakeSignalServer() {
@@ -140,8 +148,8 @@ function Live_page(props) {
 
     const resolveDefaultDisplayName = () => {
         if (chatDisplayName) return chatDisplayName;
-        if (access.isTeacher) return formatAddressLabel(access.address, "TEACHER");
-        if (access.isConnected) return formatAddressLabel(access.address, "USER");
+        if (access.isTeacher) return formatDefaultLabel("TEACHER");
+        if (access.isConnected) return formatDefaultLabel("USER");
         return "GUEST";
     };
 
@@ -555,15 +563,15 @@ function Live_page(props) {
                 if (!active) return;
                 setChatDisplayName(
                     userName || (access.isTeacher
-                        ? formatAddressLabel(access.address, "TEACHER")
-                        : formatAddressLabel(access.address, "USER"))
+                        ? formatDefaultLabel("TEACHER")
+                        : formatDefaultLabel("USER"))
                 );
             } catch (error) {
                 if (!active) return;
                 setChatDisplayName(
                     access.isTeacher
-                        ? formatAddressLabel(access.address, "TEACHER")
-                        : formatAddressLabel(access.address, "USER")
+                        ? formatDefaultLabel("TEACHER")
+                        : formatDefaultLabel("USER")
                 );
             }
         };
@@ -764,7 +772,7 @@ function Live_page(props) {
                 randomComment,
                 "normal",
                 0,
-                `Dummy_${Math.floor(Math.random() * 1000)}`
+                DUMMY_VIEWER_NAMES[Math.floor(Math.random() * DUMMY_VIEWER_NAMES.length)]
             );
         }, 3000);
         return () => clearInterval(interval);
