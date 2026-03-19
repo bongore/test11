@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     QUIZ_INPUT_MODE_PLAIN,
     QUIZ_INPUT_MODE_REGEX,
@@ -9,11 +9,10 @@ import {
 } from "../../../utils/quizAnswerInput";
 
 function Answer_area2(props) {
-    const initialConfig = useMemo(() => parseQuizInputAnswerData(props.variable), [props.variable]);
-    const [inputMode, setInputMode] = useState(initialConfig.inputMode);
-    const [pattern, setPattern] = useState(initialConfig.pattern);
-    const [placeholder, setPlaceholder] = useState(initialConfig.placeholder);
-    const [example, setExample] = useState(initialConfig.example);
+    const [inputMode, setInputMode] = useState(QUIZ_INPUT_MODE_REGEX);
+    const [pattern, setPattern] = useState("");
+    const [placeholder, setPlaceholder] = useState("");
+    const [example, setExample] = useState("");
 
     useEffect(() => {
         const nextConfig = parseQuizInputAnswerData(props.variable);
@@ -24,19 +23,23 @@ function Answer_area2(props) {
     }, [props.variable]);
 
     useEffect(() => {
-        props.set([
-            encodeQuizInputAnswerData({
-                inputMode,
-                pattern,
-                placeholder,
-                example,
-            }),
-        ]);
-    }, [example, inputMode, pattern, placeholder, props]);
+        const nextValue = encodeQuizInputAnswerData({
+            inputMode,
+            pattern,
+            placeholder,
+            example,
+        });
+        const currentValue = Array.isArray(props.variable) ? props.variable[0] || "" : "";
+        if (currentValue !== nextValue) {
+            props.set([nextValue]);
+        }
+    }, [example, inputMode, pattern, placeholder, props.set, props.variable]);
 
     const regexValid = isRegexPatternValid(pattern);
-    const exampleValid = inputMode === QUIZ_INPUT_MODE_PLAIN || !example ? true : testRegexPattern(pattern, example);
-    const correctValid = inputMode === QUIZ_INPUT_MODE_PLAIN || !props.variable1 ? true : testRegexPattern(pattern, props.variable1);
+    const showRegexExampleStatus = inputMode === QUIZ_INPUT_MODE_REGEX && example.trim() !== "";
+    const showRegexCorrectStatus = inputMode === QUIZ_INPUT_MODE_REGEX && String(props.variable1 || "").trim() !== "";
+    const exampleValid = showRegexExampleStatus ? testRegexPattern(pattern, example) : false;
+    const correctValid = showRegexCorrectStatus ? testRegexPattern(pattern, props.variable1) : false;
 
     return (
         <>
@@ -102,7 +105,7 @@ function Answer_area2(props) {
                         value={example}
                         onChange={(event) => setExample(event.target.value)}
                     />
-                    {inputMode === QUIZ_INPUT_MODE_REGEX ? (
+                    {showRegexExampleStatus ? (
                         <div style={{ color: exampleValid ? "var(--accent-green)" : "var(--accent-red)", marginTop: "8px" }}>
                             {exampleValid ? "例は正規表現に一致しています" : "例が正規表現に一致していません"}
                         </div>
@@ -121,15 +124,15 @@ function Answer_area2(props) {
                             props.set1(event.target.value);
                         }}
                     />
-                    {inputMode === QUIZ_INPUT_MODE_REGEX ? (
+                    {showRegexCorrectStatus ? (
                         <div style={{ color: correctValid ? "var(--accent-green)" : "var(--accent-red)", marginTop: "8px" }}>
                             {correctValid ? "正解は正規表現に一致しています" : "正解が正規表現に一致していません"}
                         </div>
-                    ) : (
+                    ) : inputMode === QUIZ_INPUT_MODE_PLAIN ? (
                         <div style={{ marginTop: "8px", color: "var(--text-secondary)" }}>
                             通常テキストとして保存されます。
                         </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </>

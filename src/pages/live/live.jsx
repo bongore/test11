@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaComment, FaCommentSlash } from "react-icons/fa";
 import Chat_feed from "./components/chat_feed";
 import Chat_input from "./components/chat_input";
@@ -10,6 +10,7 @@ import {
     clearLiveBroadcastState,
     setLiveBroadcastState,
 } from "../../utils/liveBroadcast";
+import { Contracts_MetaMask } from "../../contract/contracts";
 
 const DUMMY_COMMENTS = [
     "この説明、かなり分かりやすいです。",
@@ -99,6 +100,7 @@ function toStoredLiveState(snapshot) {
 }
 
 function Live_page(props) {
+    const contract = useMemo(() => props.cont || new Contracts_MetaMask(), [props.cont]);
     const [messages, setMessages] = useState([]);
     const [dummyCommentsEnabled, setDummyCommentsEnabled] = useState(false);
     const [isChatVisible, setIsChatVisible] = useState(true);
@@ -124,7 +126,7 @@ function Live_page(props) {
     const isBroadcastingRef = useRef(false);
     const clientIdRef = useRef("");
     const subscribedBroadcastIdRef = useRef("");
-    const access = useAccessControl(props.cont);
+    const access = useAccessControl(contract);
 
     const activeBroadcaster = liveState && liveState.isActive ? liveState : null;
     const canViewLive = access.canViewLive;
@@ -508,7 +510,7 @@ function Live_page(props) {
             amount,
             chatType: type,
             timestamp: fallbackMessage.timestamp,
-            user: userLabel || "",
+            user: userLabel || resolveDefaultDisplayName(),
         });
 
         if (!sent) {
@@ -548,7 +550,7 @@ function Live_page(props) {
             }
 
             try {
-                const userData = await props.cont?.get_user_data?.(access.address);
+                const userData = await contract?.get_user_data?.(access.address);
                 const userName = String(userData?.[0] || "").trim();
                 if (!active) return;
                 setChatDisplayName(
@@ -571,7 +573,7 @@ function Live_page(props) {
         return () => {
             active = false;
         };
-    }, [access.address, access.isLoading, access.isTeacher, props.cont]);
+    }, [access.address, access.isLoading, access.isTeacher, contract]);
 
     useEffect(() => {
         logPageView("live", { action: ACTION_TYPES.LIVE_PAGE_VIEWED });
@@ -721,7 +723,7 @@ function Live_page(props) {
             wsRef.current = null;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [access.address, access.isLoading, chatDisplayName, isAdmin]);
+    }, [access.address, access.isLoading, isAdmin]);
 
     useEffect(() => {
         if (isBroadcasting && localStreamRef.current) {
