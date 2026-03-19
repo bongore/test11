@@ -36,6 +36,7 @@ function getBroadcastSnapshot() {
     return {
         broadcasterId: activeBroadcast.broadcasterId,
         broadcasterAddress: activeBroadcast.broadcasterAddress,
+        broadcasterName: activeBroadcast.broadcasterName,
         broadcasterRole: activeBroadcast.broadcasterRole,
         outputType: activeBroadcast.outputType,
         startedAt: activeBroadcast.startedAt,
@@ -63,6 +64,7 @@ function notifyBroadcastUpdate() {
 
 function getDisplayName(client) {
     if (!client) return "viewer";
+    if (client.displayName) return client.displayName;
     if (client.address) {
         return `${client.address.slice(0, 6)}...${client.address.slice(-4)}`;
     }
@@ -104,6 +106,7 @@ wss.on("connection", (ws) => {
         ws,
         role: "viewer",
         address: "",
+        displayName: "",
         canBroadcast: false,
         lastHeartbeatAt: Date.now(),
     });
@@ -134,6 +137,7 @@ wss.on("connection", (ws) => {
         case "register":
             client.role = message.role || "viewer";
             client.address = message.address || "";
+            client.displayName = message.displayName || "";
             client.canBroadcast = Boolean(message.canBroadcast);
             client.lastHeartbeatAt = Date.now();
             sendPresence(clientId);
@@ -159,6 +163,7 @@ wss.on("connection", (ws) => {
             activeBroadcast = {
                 broadcasterId: clientId,
                 broadcasterAddress: client.address,
+                broadcasterName: message.broadcasterName || client.displayName || getDisplayName(client),
                 broadcasterRole: message.broadcasterRole || "Teacher / TA",
                 outputType: message.outputType || "camera",
                 startedAt: message.startedAt || new Date().toISOString(),
@@ -219,7 +224,7 @@ wss.on("connection", (ws) => {
                     amount: Number(message.amount || 0),
                     chatType: message.chatType || "normal",
                     timestamp: message.timestamp || new Date().toLocaleTimeString("ja-JP"),
-                    user: message.user || getDisplayName(client),
+                    user: message.user || client.displayName || getDisplayName(client),
                     senderId: clientId,
                 },
             });

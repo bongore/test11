@@ -53,6 +53,11 @@ function wait(ms) {
     });
 }
 
+function formatAddressLabel(address, prefix = "USER") {
+    if (!address) return prefix;
+    return `${prefix}_${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 async function wakeSignalServer() {
     const healthUrl = getSignalHealthUrl();
     let lastError = null;
@@ -86,6 +91,7 @@ function toStoredLiveState(snapshot) {
         startedAt: snapshot.startedAt,
         heartbeatAt: new Date().toISOString(),
         broadcasterAddress: snapshot.broadcasterAddress,
+        broadcasterName: snapshot.broadcasterName,
         broadcasterRole: snapshot.broadcasterRole,
         outputType: snapshot.outputType,
         viewerCount: snapshot.viewerCount || 0,
@@ -105,6 +111,7 @@ function Live_page(props) {
     const [cameraDevices, setCameraDevices] = useState([]);
     const [activeCameraId, setActiveCameraId] = useState("");
     const [remoteConnected, setRemoteConnected] = useState(false);
+    const [chatDisplayName, setChatDisplayName] = useState("");
     const [outputMode] = useState("camera");
     const videoRef = useRef(null);
     const localStreamRef = useRef(null);
@@ -128,6 +135,13 @@ function Live_page(props) {
         && access.address
         && activeBroadcaster.broadcasterAddress?.toLowerCase() !== access.address.toLowerCase()
     );
+
+    const resolveDefaultDisplayName = () => {
+        if (chatDisplayName) return chatDisplayName;
+        if (access.isTeacher) return formatAddressLabel(access.address, "TEACHER");
+        if (access.isConnected) return formatAddressLabel(access.address, "USER");
+        return "GUEST";
+    };
 
     const setDisplayedStream = (stream) => {
         if (!videoRef.current) return;
@@ -382,6 +396,7 @@ function Live_page(props) {
                 startedAt,
                 broadcasterAddress: access.address,
                 broadcasterRole: "Teacher / TA",
+                broadcasterName: resolveDefaultDisplayName(),
                 outputType: "camera",
             };
 
@@ -407,12 +422,14 @@ function Live_page(props) {
                 type: "start-broadcast",
                 startedAt,
                 broadcasterRole: session.broadcasterRole,
+                broadcasterName: session.broadcasterName,
                 outputType: "camera",
             });
 
             syncBroadcastSnapshot({
                 broadcasterId: clientIdRef.current || session.sessionId,
                 broadcasterAddress: access.address,
+                broadcasterName: session.broadcasterName,
                 broadcasterRole: session.broadcasterRole,
                 outputType: "camera",
                 startedAt,
@@ -481,7 +498,7 @@ function Live_page(props) {
             text,
             type,
             amount,
-            userLabel || (access.address ? `${access.address.slice(0, 6)}...${access.address.slice(-4)}` : "guest")
+            userLabel || resolveDefaultDisplayName()
         );
 
         const sent = sendSocketMessage({
@@ -491,7 +508,7 @@ function Live_page(props) {
             amount,
             chatType: type,
             timestamp: fallbackMessage.timestamp,
-            user: fallbackMessage.user,
+            user: userLabel || "",
         });
 
         if (!sent) {
@@ -521,6 +538,42 @@ function Live_page(props) {
     }, [isBroadcasting]);
 
     useEffect(() => {
+        let active = true;
+
+        const loadDisplayName = async () => {
+            if (access.isLoading) return;
+            if (!access.address) {
+                if (active) setChatDisplayName("GUEST");
+                return;
+            }
+
+            try {
+                const userData = await props.cont?.get_user_data?.(access.address);
+                const userName = String(userData?.[0] || "").trim();
+                if (!active) return;
+                setChatDisplayName(
+                    userName || (access.isTeacher
+                        ? formatAddressLabel(access.address, "TEACHER")
+                        : formatAddressLabel(access.address, "USER"))
+                );
+            } catch (error) {
+                if (!active) return;
+                setChatDisplayName(
+                    access.isTeacher
+                        ? formatAddressLabel(access.address, "TEACHER")
+                        : formatAddressLabel(access.address, "USER")
+                );
+            }
+        };
+
+        loadDisplayName();
+
+        return () => {
+            active = false;
+        };
+    }, [access.address, access.isLoading, access.isTeacher, props.cont]);
+
+    useEffect(() => {
         logPageView("live", { action: ACTION_TYPES.LIVE_PAGE_VIEWED });
         appendActivityLog(ACTION_TYPES.LIVE_PAGE_VIEWED, { page: "live" });
         let socket = null;
@@ -544,6 +597,7 @@ function Live_page(props) {
                         socket.send(JSON.stringify({
                             type: "register",
                             address: access.address,
+                            displayName: resolveDefaultDisplayName(),
                             role: isAdmin ? "staff" : "viewer",
                             canBroadcast: isAdmin,
                         }));
@@ -584,7 +638,7 @@ function Live_page(props) {
                     closeViewerPeer();
                     if (!isBroadcastingRef.current) setDisplayedStream(null);
                 } else if (!isBroadcastingRef.current) {
-                    setLiveNotice(`${message.activeBroadcast.broadcasterRole} がカメラ配信を開始しました。`);
+                    setLiveNotice(`${message.activeBroadcast.broadcasterName || message.activeBroadcast.broadcasterRole} がカメラ配信を開始しました。`);
                 }
                 break;
             case "broadcast-ended":
@@ -630,7 +684,7 @@ function Live_page(props) {
                     type: message.message.chatType || "normal",
                     amount: message.message.amount || 0,
                     timestamp: message.message.timestamp,
-                    user: message.message.user || "viewer",
+                    user: message.message.user || resolveDefaultDisplayName(),
                 };
                 setMessages((prev) => [...prev.slice(-119), nextMessage]);
                 if (nextMessage.type === "superchat") {
@@ -667,7 +721,7 @@ function Live_page(props) {
             wsRef.current = null;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [access.address, access.isLoading, isAdmin]);
+    }, [access.address, access.isLoading, chatDisplayName, isAdmin]);
 
     useEffect(() => {
         if (isBroadcasting && localStreamRef.current) {
@@ -684,10 +738,11 @@ function Live_page(props) {
         sendSocketMessage({
             type: "register",
             address: access.address,
+            displayName: resolveDefaultDisplayName(),
             role: isAdmin ? "staff" : "viewer",
             canBroadcast: isAdmin,
         });
-    }, [access.address, access.isLoading, isAdmin]);
+    }, [access.address, access.isLoading, chatDisplayName, isAdmin]);
 
     useEffect(() => {
         if (!activeBroadcaster || isBroadcasting || !canViewLive || signalStatus !== "connected") {
@@ -747,7 +802,7 @@ function Live_page(props) {
 
                         {activeBroadcaster && (
                             <div style={{ position: "absolute", left: "16px", top: "16px", zIndex: 10, padding: "10px 14px", borderRadius: "999px", background: "rgba(0,0,0,0.55)", color: "#fff", border: "1px solid rgba(255,255,255,0.18)" }}>
-                                配信者: {activeBroadcaster.broadcasterAddress} / 視聴者 {activeBroadcaster.viewerCount || 0} 人
+                                配信者: {activeBroadcaster.broadcasterName || activeBroadcaster.broadcasterAddress} / 視聴者 {activeBroadcaster.viewerCount || 0} 人
                             </div>
                         )}
 

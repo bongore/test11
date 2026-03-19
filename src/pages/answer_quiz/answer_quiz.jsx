@@ -12,6 +12,12 @@ import {
     logPageView,
     saveDraft,
 } from "../../utils/activityLog";
+import {
+    QUIZ_INPUT_MODE_PLAIN,
+    QUIZ_INPUT_MODE_REGEX,
+    parseQuizInputAnswerData,
+    testRegexPattern,
+} from "../../utils/quizAnswerInput";
 
 function Show_correct(props) {
     if (!props.cont) return null;
@@ -65,26 +71,39 @@ function Answer_type1(props) {
 }
 
 function Answer_type2(props) {
-    const answerData = props.quiz[6].split(",");
-    const pattern = answerData[0];
-    const example = answerData[1];
+    const answerConfig = parseQuizInputAnswerData(props.quiz[6]);
     const [hasError, setHasError] = useState(true);
 
     const handleTestPattern = (value) => {
-        const valid = new RegExp(pattern).test(value);
+        const valid =
+            answerConfig.inputMode === QUIZ_INPUT_MODE_PLAIN
+                ? value.trim().length > 0
+                : testRegexPattern(answerConfig.pattern, value);
         setHasError(!valid);
         props.onValidation(valid, value.length);
     };
 
+    useEffect(() => {
+        if (!props.answer) {
+            setHasError(true);
+            return;
+        }
+        handleTestPattern(props.answer);
+        // answerConfig values are derived from quiz data.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.answer, props.quiz]);
+
     return (
         <div className="answer-section">
             <h4 className="heading-md" style={{ marginBottom: "var(--space-4)", color: "#ffffff" }}>記述式回答</h4>
-            <p style={{ marginBottom: "var(--space-2)", color: "#ffffff", opacity: 0.9 }}>例: {example}</p>
+            {answerConfig.example ? (
+                <p style={{ marginBottom: "var(--space-2)", color: "#ffffff", opacity: 0.9 }}>例: {answerConfig.example}</p>
+            ) : null}
             <input
                 type="text"
                 className="form-control-custom"
                 value={props.answer || ""}
-                placeholder="回答を入力してください"
+                placeholder={answerConfig.inputMode === QUIZ_INPUT_MODE_PLAIN ? (answerConfig.placeholder || "回答を入力してください") : "回答を入力してください"}
                 disabled={props.disabled}
                 onChange={(event) => {
                     if (props.disabled) return;
@@ -98,7 +117,9 @@ function Answer_type2(props) {
                     className={`answer-validation ${hasError ? "answer-validation--error" : "answer-validation--ok"}`}
                     style={{ color: hasError ? "var(--accent-red)" : "var(--accent-green)", marginTop: "var(--space-2)" }}
                 >
-                    {hasError ? "入力形式が正しくありません" : "入力形式は問題ありません"}
+                    {answerConfig.inputMode === QUIZ_INPUT_MODE_REGEX
+                        ? (hasError ? "入力形式が正しくありません" : "入力形式は問題ありません")
+                        : (hasError ? "回答を入力してください" : "入力内容を受け付けました")}
                 </div>
             )}
         </div>

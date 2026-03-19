@@ -4,6 +4,7 @@ import {useState, useEffect} from "react";
 import MDEditor, {selectWord} from "@uiw/react-md-editor";
 import {useParams} from "react-router-dom";
 import Button from "react-bootstrap/Button";
+import { QUIZ_INPUT_MODE_PLAIN, parseQuizInputAnswerData, testRegexPattern } from "../../../utils/quizAnswerInput";
 function Answer_type1(props) {
     return (
         <>
@@ -58,17 +59,15 @@ function Answer_type1(props) {
 }
 
 function Answer_type2(props) {
-    const answer_data = props.quiz[6].split(",");
-    const pattern = answer_data[0];
-    const example = answer_data[1];
+    const answerConfig = parseQuizInputAnswerData(props.quiz[6]);
     const [error_collect, SetError_Collect] = useState(true);
 
     //正規表現のエラー表示
     const handle_Test_pattern = (event, target_set) => {
         const value = event.target.value;
 
-        // 入力値が正規表現にマッチしない場合は、エラーメッセージを設定
-        if (!new RegExp(pattern).test(value)) {
+        const isValid = answerConfig.inputMode === QUIZ_INPUT_MODE_PLAIN ? value.trim().length > 0 : testRegexPattern(answerConfig.pattern, value);
+        if (!isValid) {
             target_set(true);
         } else {
             target_set(false);
@@ -83,19 +82,22 @@ function Answer_type2(props) {
                 <div className="col-10">
                     正解を入力
                     <br />
-                    <p style={{ color: "#ffffff" }}>例:{example}</p>
+                    {answerConfig.example ? <p style={{ color: "#ffffff" }}>例:{answerConfig.example}</p> : null}
                     {/* 1行のみのフォームにしたい */}
                     <input
                         type="text"
                         className="form-control"
                         value={props.answer}
+                        placeholder={answerConfig.inputMode === QUIZ_INPUT_MODE_PLAIN ? (answerConfig.placeholder || "回答を入力してください") : undefined}
                         onChange={(event) => {
                             handle_Test_pattern(event, SetError_Collect);
                             props.setAnswer(event.target.value);
                         }}
                     />
                     <div style={{ color: error_collect ? "var(--accent-red)" : "var(--accent-green)", marginTop: "10px" }}>
-                        {error_collect ? "❌ 入力形式が正しくありません" : "✅ OK"}
+                        {answerConfig.inputMode === QUIZ_INPUT_MODE_PLAIN
+                            ? (error_collect ? "❌ 回答を入力してください" : "✅ OK")
+                            : (error_collect ? "❌ 入力形式が正しくありません" : "✅ OK")}
                     </div>
                 </div>
             </div>
