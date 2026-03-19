@@ -1,0 +1,289 @@
+/* ============================================================
+   Admin Page - Modern Dark Theme
+   ============================================================ */
+
+.admin-page {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.admin-page .page-header {
+  margin-bottom: var(--space-8);
+}
+
+.admin-page .page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-2);
+}
+
+.admin-page .page-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Tab Navigation ── */
+
+.admin-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+  padding: var(--space-1);
+  background: var(--glass-bg);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--glass-border);
+}
+
+.admin-tab-btn {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.admin-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-tab-btn.active {
+  background: var(--gradient-primary);
+  color: var(--text-on-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── Content Panel ── */
+
+.admin-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--glass-shadow);
+  animation: slideUp 0.3s ease-out;
+}
+
+.admin-panel .section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.admin-panel .section-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+/* ── Override Bootstrap form ── */
+
+.admin-panel .form-control,
+.admin-panel textarea.form-control {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  font-family: var(--font-main) !important;
+  font-size: var(--font-size-base) !important;
+  transition: all var(--transition-base) !important;
+}
+
+.admin-panel .form-control:focus,
+.admin-panel textarea.form-control:focus {
+  outline: none !important;
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 0 3px var(--accent-cyan-dim) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.admin-panel .form-control::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+.admin-panel .form-label {
+  color: var(--text-secondary) !important;
+  font-weight: var(--font-weight-medium) !important;
+  font-size: var(--font-size-sm) !important;
+}
+
+/* ── Admin Buttons ── */
+
+.admin-panel .btn-action {
+  background: var(--gradient-primary);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-6);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin-top: var(--space-4);
+}
+
+.admin-panel .btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-cyan);
+  filter: brightness(1.1);
+}
+
+/* ── Address List ── */
+
+.address-list {
+  margin-top: var(--space-4);
+}
+
+.address-list-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.address-item {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-1);
+  word-break: break-all;
+  border-left: 2px solid var(--accent-cyan);
+}
+
+.address-item-id {
+  color: var(--accent-cyan);
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+/* ── Results Table ── */
+
+.results-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-4);
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.results-table thead th {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--glass-border);
+  text-align: left;
+}
+
+.results-table thead th:first-child {
+  border-radius: var(--radius-md) 0 0 0;
+}
+
+.results-table thead th:last-child {
+  border-radius: 0 var(--radius-md) 0 0;
+}
+
+.results-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.results-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.results-table tbody td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.results-table tbody td.address-cell {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.results-table tbody td.score-cell {
+  color: var(--accent-cyan);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ── CSV Download ── */
+
+.csv-download-area {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.csv-download-area a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--accent-cyan);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent-cyan-dim);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.csv-download-area a:hover {
+  background: rgba(0, 212, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ── Not Authorized ── */
+
+.admin-not-authorized {
+  text-align: center;
+  padding: var(--space-16);
+  color: var(--text-secondary);
+}
+
+/* ── Responsive ── */
+
+@media screen and (max-width: 576px) {
+  .admin-tabs {
+    flex-direction: column;
+  }
+
+  .admin-panel {
+    padding: var(--space-5);
+  }
+}

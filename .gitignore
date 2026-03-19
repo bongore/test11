@@ -1,0 +1,10 @@
+node_modules
+build
+.env
+*.log
+live-signal.err.log
+live-signal.out.log
+serve.err.log
+serve.out.log
+dist
+.DS_Store

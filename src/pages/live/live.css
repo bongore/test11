@@ -1,0 +1,170 @@
+/* ============================================================
+   Live Page Styles
+   ============================================================ */
+
+.live-page {
+    padding: var(--space-4);
+    height: calc(100vh - 60px); /* 100vh を基本に絶対指定して崩れを防ぐ */
+    display: flex;
+    flex-direction: column;
+}
+
+.live-container {
+    position: relative; /* オーバーレイのための基準位置 */
+    flex: 1; /* 親のフレックス領域を全て使う */
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+}
+
+/* ================== Video Section ================== */
+.video-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* コンテナ全体を埋める */
+    background: #000;
+    z-index: 0; /* 背景として最背面に配置 */
+}
+
+.video-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-placeholder {
+    color: var(--text-primary);
+    text-align: center;
+    opacity: 0.6;
+}
+
+/* ================== Danmaku Animation ================== */
+.danmaku-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.danmaku-item {
+    position: absolute;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 24px;
+    right: -100%; /* Start off-screen right */
+    animation-name: slide-left;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+.normal-danmaku {
+    color: #ffffff;
+}
+
+.superchat-danmaku {
+    color: var(--accent-yellow);
+    font-size: 32px;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, rgba(230,200,50,0.9), rgba(255,100,50,0.8));
+    border-radius: var(--radius-full);
+    border: 2px solid #FFD700;
+}
+
+@keyframes slide-left {
+    from {
+        transform: translateX(100vw);
+    }
+    to {
+        transform: translateX(-200vw);
+    }
+}
+
+/* ================== Chat Section (Overlay) ================== */
+.chat-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%; /* 画面下半分より少し上までグラデーション */
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    z-index: 10; /* 動画より手前に表示 */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 50%, transparent 100%);
+    pointer-events: none; /* 背景グラデ自体はイベントをスルー */
+}
+
+/* チャットヘッダーは不要なので、見えなくするか微調整 */
+.chat-header {
+    display: none;
+}
+
+.chat-header {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.chat-feed-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    pointer-events: auto; /* チャットフィードはスクロール等の操作可能に */
+    /* スクロールバーを見えにくくする */
+    scrollbar-width: none;
+}
+.chat-feed-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* チャット枠全体のボディ */
+.chat-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    pointer-events: none;
+}
+
+.chat-input-container {
+    flex: none;
+    padding: var(--space-3) var(--space-4);
+    background: transparent;
+    width: 100%;
+    pointer-events: auto; /* 入力欄は操作可能に */
+}
+
+/* ================== Responsive Adjustments ================== */
+@media screen and (max-width: 768px) {
+    .live-page {
+        padding: 0; /* スマホでは全画面ピッタリに */
+        height: calc(100vh - 60px); 
+    }
+    
+    .live-container {
+        border-radius: 0;
+    }
+
+    .chat-section {
+        height: 70%; /* スマホではチャット領域を広く取る */
+    }
+
+    .chat-input-container {
+        padding: var(--space-2) var(--space-3);
+    }
+}

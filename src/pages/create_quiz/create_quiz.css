@@ -1,0 +1,186 @@
+/* ============================================================
+   Create / Edit Quiz - Modern Dark Form
+   ============================================================ */
+
+.quiz-form-page {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.quiz-form-page .page-header {
+  margin-bottom: var(--space-8);
+}
+
+.quiz-form-page .page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-2);
+}
+
+.quiz-form-page .page-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Form Card ── */
+
+.quiz-form-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ── Form Group ── */
+
+.quiz-form-group {
+  margin-bottom: var(--space-6);
+}
+
+.quiz-form-group .form-label-custom {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.03em;
+}
+
+.quiz-form-group .form-label-custom .label-icon {
+  margin-right: var(--space-2);
+  color: var(--accent-cyan);
+}
+
+/* Override Bootstrap form-control for dark theme */
+.quiz-form-card .form-control,
+.quiz-form-card textarea.form-control {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  font-family: var(--font-main) !important;
+  font-size: var(--font-size-base) !important;
+  transition: all var(--transition-base) !important;
+}
+
+.quiz-form-card .form-control:focus,
+.quiz-form-card textarea.form-control:focus {
+  outline: none !important;
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 0 3px var(--accent-cyan-dim) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.quiz-form-card .form-control::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+.quiz-form-card .form-label {
+  color: var(--text-secondary) !important;
+  font-weight: var(--font-weight-medium) !important;
+  font-size: var(--font-size-sm) !important;
+}
+
+/* ── Thumbnail Preview ── */
+
+.thumbnail-preview {
+  display: inline-block;
+  margin-top: var(--space-3);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.3);
+  max-width: 200px;
+}
+
+.thumbnail-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* ── Markdown Editor Override ── */
+
+.quiz-form-card .w-md-editor {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.quiz-form-card .w-md-editor-toolbar {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.quiz-form-card .w-md-editor-text-pre > code,
+.quiz-form-card .w-md-editor-text-input,
+.quiz-form-card .w-md-editor-text {
+  color: var(--text-primary) !important;
+}
+
+/* ── Date Inputs ── */
+
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.quiz-form-card input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* ── Submit Button ── */
+
+.submit-area {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--glass-border);
+}
+
+.btn-submit-quiz {
+  background: var(--gradient-primary);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-8);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn-submit-quiz:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-cyan);
+  filter: brightness(1.1);
+}
+
+.btn-submit-quiz:active {
+  transform: translateY(0);
+}
+
+/* ── Responsive ── */
+
+@media screen and (max-width: 576px) {
+  .quiz-form-card {
+    padding: var(--space-5);
+  }
+
+  .date-row {
+    grid-template-columns: 1fr;
+  }
+}

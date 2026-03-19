@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: test2-live-signal
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run live:signal

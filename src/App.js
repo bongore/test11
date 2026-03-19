@@ -1,0 +1,100 @@
+import { Suspense, lazy, useEffect } from "react";
+import "./styles/design-tokens.css";
+import "./styles/animations.css";
+import { HashRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import Nav_menu from "./pages/navbar/navbar";
+import { Contracts_MetaMask } from "./contract/contracts";
+import { ACTION_TYPES, appendActivityLog, logPageView } from "./utils/activityLog";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+const Login = lazy(() => import("./contract/login"));
+const User_page = lazy(() => import("./pages/user_page/user_page"));
+const Create_quiz = lazy(() => import("./pages/create_quiz/create_quiz"));
+const List_quiz = lazy(() => import("./pages/list_quiz/list_quiz_top"));
+const Answer_quiz = lazy(() => import("./pages/answer_quiz/answer_quiz"));
+const Admin_page = lazy(() => import("./pages/admin_page/admin"));
+const Edit_list = lazy(() => import("./pages/edit_list/edit_list_top"));
+const Edit_quiz = lazy(() => import("./pages/edit_quiz/edit_quiz"));
+const Investment_page = lazy(() => import("./pages/investment_page/investment_page"));
+const Dashboard = lazy(() => import("./pages/dashboard/dashboard"));
+const Ranking = lazy(() => import("./pages/ranking/ranking"));
+const Notifications = lazy(() => import("./pages/notifications/notifications"));
+const Live_page = lazy(() => import("./pages/live/live"));
+
+function RouteFallback() {
+    useEffect(() => {
+        appendActivityLog(ACTION_TYPES.ROUTE_FALLBACK_SHOWN, { page: "route_fallback" });
+    }, []);
+
+    return (
+        <div className="main-content">
+            <div className="glass-card animate-fadeIn" style={{ padding: "var(--space-8)", marginTop: "var(--space-6)" }}>
+                <h2 className="heading-lg" style={{ marginBottom: "var(--space-2)" }}>ページを読み込み中</h2>
+                <p style={{ margin: 0, color: "var(--text-secondary)" }}>
+                    初回表示の通信量を減らすため、必要な画面だけ順次読み込んでいます。
+                </p>
+            </div>
+        </div>
+    );
+}
+
+function RouteLogger() {
+    const location = useLocation();
+
+    useEffect(() => {
+        logPageView("route", {
+            pathname: location.pathname,
+            hash: location.hash,
+            search: location.search,
+        });
+    }, [location]);
+
+    return null;
+}
+
+function AppRoutes({ cont }) {
+    return (
+        <>
+            <RouteLogger />
+            <Nav_menu cont={cont} home={process.env.PUBLIC_URL} />
+            <Suspense fallback={<RouteFallback />}>
+                <main className="main-content">
+                    <Routes>
+                        <Route path="/login" element={<Login url="login" cont={cont} />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/ranking" element={<Ranking />} />
+                        <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/user_page/:address" element={<User_page url="user_page" cont={cont} />} />
+                        <Route path="/create_quiz" element={<Create_quiz url="create_quiz" cont={cont} />} />
+                        <Route path="/list_quiz" element={<List_quiz url="list_quiz" cont={cont} />} />
+                        <Route path="/answer_quiz/:id" element={<Answer_quiz url="answer_quiz" cont={cont} />} />
+                        <Route path="/admin" element={<Admin_page url="admin" cont={cont} />} />
+                        <Route path="/edit_list" element={<Edit_list url="edit_list" cont={cont} />} />
+                        <Route path="/edit_quiz/:id" element={<Edit_quiz url="edit_quiz" cont={cont} />} />
+                        <Route path="/investment_page/:id" element={<Investment_page url="investment_page" cont={cont} />} />
+                        <Route path="/live" element={<Live_page url="live" cont={cont} />} />
+                        <Route path="/" element={<Navigate replace to="/dashboard" />} />
+                    </Routes>
+                </main>
+            </Suspense>
+        </>
+    );
+}
+
+function App() {
+    const cont = new Contracts_MetaMask();
+
+    useEffect(() => {
+        appendActivityLog(ACTION_TYPES.APP_SESSION_STARTED, { page: "app" });
+    }, []);
+
+    return (
+        <div className="App">
+            <HashRouter>
+                <AppRoutes cont={cont} />
+            </HashRouter>
+        </div>
+    );
+}
+
+export default App;
